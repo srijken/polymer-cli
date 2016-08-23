@@ -13,6 +13,7 @@ import * as commandLineArgs from 'command-line-args';
 
 import {globalArguments} from './args';
 import {ArgDescriptor} from './commands/command';
+import {AnalyzeCommand} from './commands/analyze';
 import {BuildCommand} from './commands/build';
 import {HelpCommand} from './commands/help';
 import {InitCommand} from './commands/init';
@@ -96,6 +97,7 @@ export class PolymerCli {
       }
     }
 
+    this.addCommand(new AnalyzeCommand());
     this.addCommand(new BuildCommand());
     this.addCommand(new HelpCommand(this.commands));
     this.addCommand(new InitCommand());
