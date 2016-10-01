@@ -32,7 +32,7 @@ export class AnalyzeCommand implements Command {
 
   async run(options, config): Promise<any> {
     if (!options || !options.input) {
-      logger.debug('no file given');
+      logger.debug('no inputs given');
       return;
     }
 
@@ -46,7 +46,8 @@ export class AnalyzeCommand implements Command {
     for (const input of options.input) {
       const document = await analyzer.analyze(input);
       const docElements = Array.from(document.getByKind('element'))
-          .filter((e) => !e.sourceRange.file.startsWith('bower_components'));
+          .filter((e) => !e.sourceRange.file.startsWith('bower_components') &&
+            !e.sourceRange.file.startsWith('node_modules'));
       docElements.forEach((e) => elements.add(e));
     }
     const metadata = generateElementMetadata(Array.from(elements), '');
