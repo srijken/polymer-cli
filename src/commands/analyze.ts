@@ -8,49 +8,33 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-import {Analyzer} from 'polymer-analyzer';
-import {Element} from 'polymer-analyzer/lib/model/model';
-import {FSUrlLoader} from 'polymer-analyzer/lib/url-loader/fs-url-loader';
-import {PackageUrlResolver} from 'polymer-analyzer/lib/url-loader/package-url-resolver';
 import * as logging from 'plylog';
-import {Command} from './command';
-import {generateElementMetadata} from 'polymer-analyzer/lib/generate-elements';
+import {Command, CommandOptions, ProjectConfig} from './command';
 
-let logger = logging.getLogger('cli.command.analyze');
+const logger = logging.getLogger('cli.command.analyze');
 
 export class AnalyzeCommand implements Command {
   name = 'analyze';
 
-  description = 'Analyzes the input file with the Polymer Analyzer';
+  description = 'Writes analysis metadata in JSON format to standard out';
 
   args = [{
     name: 'input',
-    description: 'The file to analyze',
+    description: 'The files to analyze',
     defaultOption: true,
     multiple: true,
   }];
 
-  async run(options, config): Promise<any> {
-    if (!options || !options.input) {
+  async run(options: CommandOptions, config: ProjectConfig): Promise<any> {
+    const analyze = require('../analyze/analyze').analyze;
+    const root = config.root;
+    const inputs = options['input'];
+
+    if (!options || !options['input']) {
       logger.debug('no inputs given');
       return;
     }
-
-    const analyzer = new Analyzer({
-      urlLoader: new FSUrlLoader(config.root),
-      urlResolver: new PackageUrlResolver(),
-    });
-
-    const elements = new Set<Element>();
-
-    for (const input of options.input) {
-      const document = await analyzer.analyze(input);
-      const docElements = Array.from(document.getByKind('element'))
-          .filter((e) => !e.sourceRange.file.startsWith('bower_components') &&
-            !e.sourceRange.file.startsWith('node_modules'));
-      docElements.forEach((e) => elements.add(e));
-    }
-    const metadata = generateElementMetadata(Array.from(elements), '');
-    console.log(JSON.stringify(metadata, null, 2));
+    const metadata = await analyze(root, inputs);
+    process.stdout.write(JSON.stringify(metadata, null, 2));
   }
 }
