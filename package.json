@@ -56,7 +56,7 @@
     "parse5": "^2.2.3",
     "plylog": "^0.4.0",
     "polylint": "^2.10.0",
-    "polymer-build": "https://github.com/srijken/polymer-build/archive/0.5.1.tar.gz",
+    "polymer-build": "git://github.com/srijken/polymer-build.git#issue78",
     "polymer-project-config": "^1.0.0",
     "polyserve": "^0.13.0",
     "request": "^2.72.0",
